@@ -132,7 +132,7 @@ export default function App() {
       km: "130.000 km",
       transmission: "Automată",
       fuel: "Electrică (50 kW)",
-      images: [ teslaImg1, teslaImg2, teslaImg3, teslaImg4, teslaImg5 ]
+      images: [ teslaImg5, teslaImg1, teslaImg2, teslaImg3, teslaImg4 ]
     },
     {
       id: 3,
@@ -423,6 +423,22 @@ export default function App() {
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Floating WhatsApp Button */}
+      <a
+        href="https://wa.me/40760556225"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="
+          fixed bottom-20 right-6
+          bg-green-500 hover:bg-green-600
+          text-white p-4 rounded-full
+          shadow-lg transition
+          z-50
+        "
+      >
+        <FaWhatsapp size={24} />
+      </a>
+
     </div>
   );
 }
