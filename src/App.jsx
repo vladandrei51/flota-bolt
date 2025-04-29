@@ -209,7 +209,7 @@ export default function App() {
       </header>
 
       {/* Conținut principal */}
-      <main className="ml-0 md:ml-64 w-full pt-0 md:pt-0">
+      <main className="ml-0 md:ml-44 w-full pt-0 md:pt-0">
         <AnimatePresence>
           {sections.map(sec => (
             <motion.section
@@ -224,8 +224,8 @@ export default function App() {
             >
               {/* Acasă */}
               {sec.id === "home" && (
-                <div className="max-w-3xl mx-auto text-center space-y-6">
-                  <h2 className="text-4xl font-bold text-green-800">Bun venit!</h2>
+                <div className="max-w-4xl mx-auto text-center space-y-6">
+                  <h2 className="text-3xl font-bold text-green-800">Bun venit!</h2>
                   <p className="text-lg">
                     Alătură-te flotei noastre autorizate și începe să câștigi bani conducând pentru{" "}
                     <strong>Bolt</strong> sau <strong>Uber</strong> în Cluj! Poți folosi{" "}
@@ -264,7 +264,7 @@ export default function App() {
 
               {/* Beneficii */}
               {sec.id === "beneficii" && (
-                <div className="max-w-3xl mx-auto space-y-6">
+                <div className="max-w-4xl mx-auto space-y-6">
                   <h2 className="text-3xl font-semibold text-green-700">Beneficii</h2>
                   <ul className="list-none text-lg space-y-3">
                     {[
@@ -284,7 +284,7 @@ export default function App() {
 
               {/* Cerințe */}
               {sec.id === "cerinte" && (
-                <div className="max-w-3xl mx-auto">
+                <div className="max-w-4xl mx-auto">
                   <h2 className="text-3xl font-semibold text-green-700">Cerințe</h2>
                   <p className="text-lg mt-2">
                     Serviciile de transport alternativ sunt reglementate de <strong>OUG 49/2019</strong>. 
@@ -365,7 +365,7 @@ export default function App() {
 
               {/* Contact */}
               {sec.id === "contact" && (
-                <div className="max-w-3xl mx-auto space-y-6 text-center pb-5">
+                <div className="max-w-4xl mx-auto space-y-6 text-center pb-3">
                   <h2 className="text-3xl font-semibold text-green-800">Contact</h2>
                   <p>Vrei să începi sau ai întrebări? Suntem aici pentru tine.</p>
                   <div className="flex flex-col sm:flex-row justify-center gap-6 text-sm">
