@@ -1,22 +1,67 @@
+// src/App.jsx
 import React, { useEffect, useRef, useState } from "react";
-import { X, Mail, Phone, Building2, Home, Star, ListChecks, Car, Check, MessageCircle } from "lucide-react";
+import {
+  X,
+  Mail,
+  Phone,
+  Building2,
+  Home,
+  Star,
+  ListChecks,
+  Car,
+  Check,
+  MessageCircle
+} from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa";
 import { AnimatePresence, motion } from "framer-motion";
 
+import skodaImg1 from "./pics/skoda/1.jpeg";
+import skodaImg2 from "./pics/skoda/2.jpeg";
+import skodaImg3 from "./pics/skoda/3.jpg";
+import skodaImg4 from "./pics/skoda/4.jpg";
+import skodaImg5 from "./pics/skoda/5.jpg";
+
+import teslaImg1 from "./pics/tesla/1.jpg";
+import teslaImg2 from "./pics/tesla/2.jpg";
+import teslaImg3 from "./pics/tesla/3.jpg";
+import teslaImg4 from "./pics/tesla/4.jpg";
+import teslaImg5 from "./pics/tesla/5.jpg";
+
+import loganImg1 from "./pics/logan/1.jpg";
+import loganImg2 from "./pics/logan/2.jpg";
+import loganImg3 from "./pics/logan/3.jpg";
+import loganImg4 from "./pics/logan/4.jpg";
+
+// “Enum” de statusuri
+const CAR_STATUS = {
+  DISPONIBILA: "Disponibilă",
+  INCHIRIATA:  "Închiriată",
+};
+
+// Stiluri pentru badge-ul de status
+const STATUS_CLASSES = {
+  [CAR_STATUS.DISPONIBILA]: "bg-green-100 text-green-800",
+  [CAR_STATUS.INCHIRIATA]:  "bg-gray-100 text-gray-600"
+};
+
 const sections = [
-  { id: "home", label: "Acasă" },
+  { id: "home",      label: "Acasă" },
   { id: "beneficii", label: "Beneficii" },
-  { id: "cerinte", label: "Cerințe" },
-  { id: "masini", label: "Maşini flotă" },
-  { id: "contact", label: "Contact" },
+  { id: "cerinte",   label: "Cerințe" },
+  { id: "masini",    label: "Mașini flotă" },
+  { id: "contact",   label: "Contact" }
 ];
 
 export default function App() {
-  const [activeSection, setActiveSection] = useState("home");
-  const [selectedCar, setSelectedCar] = useState(null);
-  const [selectedImage, setSelectedImage] = useState("");
-  const refs = useRef({});
+  const [activeSection, setActiveSection]   = useState("home");
+  const [manualSection, setManualSection]   = useState(null);
+  const [selectedCar,    setSelectedCar]    = useState(null);
+  const [selectedImage,  setSelectedImage]  = useState("");
+  const refs             = useRef({});
+  const manualRef        = useRef(manualSection);
+  manualRef.current     = manualSection;
 
+  // 1) IntersectionObserver pentru actualizarea activeSection
   useEffect(() => {
     const observer = new IntersectionObserver(
       entries => {
@@ -26,92 +71,78 @@ export default function App() {
           }
         });
       },
-      {
-        rootMargin: "-50% 0px -50% 0px",
-        threshold: 0,
-      }
+      { rootMargin: "-50% 0px -50% 0px", threshold: 0 }
     );
-
-    // Observăm toate secțiunile
     sections.forEach(s => {
       const el = refs.current[s.id];
       if (el) observer.observe(el);
     });
+    return () => observer.disconnect();
+  }, []);
 
-    // Fallback + reset când ieși din "contact"
+  // 2) Scroll handler și reset manualSection doar la input user
+  useEffect(() => {
     const handleScroll = () => {
+      if (manualRef.current) return;
       setActiveSection(prev => {
         const { scrollY, innerHeight } = window;
         const fullH = document.documentElement.scrollHeight;
-        // dacă ești jos de tot
-        if (scrollY + innerHeight >= fullH - 2) {
-          return "contact";
-        }
-        // dacă erai pe contact și te-ai ridicat măcar puțin, du-te la masini
-        if (prev === "contact") {
-          return "masini";
-        }
-        // altfel, lasă IntersectionObserver-ul să decidă
+        if (scrollY + innerHeight >= fullH - 2) return "contact";
+        if (prev === "contact") return "masini";
         return prev;
       });
     };
+    const clearManual = () => {
+      if (manualRef.current) setManualSection(null);
+    };
 
     window.addEventListener("scroll", handleScroll);
+    window.addEventListener("wheel", clearManual,    { passive: true });
+    window.addEventListener("touchmove", clearManual,{ passive: true });
+
     return () => {
-      observer.disconnect();
       window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("wheel", clearManual);
+      window.removeEventListener("touchmove", clearManual);
     };
   }, []);
 
-
-  const scrollTo = id => refs.current[id]?.scrollIntoView({ behavior: "smooth" });
+  // 3) Scroll-to cu override manualSection
+  const scrollTo = id => {
+    setManualSection(id);
+    refs.current[id]?.scrollIntoView({ behavior: "smooth" });
+  };
 
   const masini = [
     {
       id: 1,
       title: "Skoda Rapid 2016",
-      status: "Închiriată",
+      status: CAR_STATUS.INCHIRIATA,
       rent: "450 RON / săptămână",
       km: "235.000 km",
-      transmission: "Manuala",
-      fuel: "Motorina (1.4 TDI)",
-      images: [
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/b/b5/2014_Skoda_Rapid_SE_Connect_TSi_1.2_Rear.jpg/2560px-2014_Skoda_Rapid_SE_Connect_TSi_1.2_Rear.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/e/ee/Skoda_MissionL_%28rear_quarter%29.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1c/%C5%A0koda_Rapid_-_wn%C4%99trze_%28MSP15%29.JPG/2560px-%C5%A0koda_Rapid_-_wn%C4%99trze_%28MSP15%29.JPG",
-        "https://upload.wikimedia.org/wikipedia/commons/7/7e/Skoda_Rapid_2021_%28cropped%29.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/2/2f/Skoda_Rapid_2021_3_%28cropped%29.jpg"
-      ]
+      transmission: "Manuală",
+      fuel: "Motorină (1.4 TDI)",
+      images: [ skodaImg1, skodaImg2, skodaImg3, skodaImg4, skodaImg5 ]
     },
     {
       id: 2,
-      title: "Tesla Model 3 Standard Range Plus 2019",
-      status: "Disponibilă",
+      title: "Tesla Model 3 SR+ 2020",
+      status: CAR_STATUS.INCHIRIATA,
       rent: "1000 RON / săptămână",
       km: "130.000 km",
       transmission: "Automată",
-      fuel: "Electrica (50 kW)",
-      images: [
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e0/Tesla_Model_3_Performance_%28Facelift%29_%E2%80%93_h_01012025.jpg/2560px-Tesla_Model_3_Performance_%28Facelift%29_%E2%80%93_h_01012025.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/0/09/Tesla_Model_3_%282023%29_Auto_Zuerich_2023_1X7A1315.jpg/2560px-Tesla_Model_3_%282023%29_Auto_Zuerich_2023_1X7A1315.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/2/21/The_Model_3_Interior.jpg/2560px-The_Model_3_Interior.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0c/First_Model_3_production_cars_ready_for_delivery.jpg/2560px-First_Model_3_production_cars_ready_for_delivery.jpg"
-      ]
+      fuel: "Electrică (50 kW)",
+      images: [ teslaImg1, teslaImg2, teslaImg3, teslaImg4, teslaImg5 ]
     },
     {
       id: 3,
-      title: "Dacia Logan 2023",
-      status: "Disponibilă",
+      title: "Dacia Logan 2022",
+      status: CAR_STATUS.INCHIRIATA,
       rent: "600 RON / săptămână",
       km: "81.000 km",
-      transmission: "Manuala",
+      transmission: "Manuală",
       fuel: "GPL + Benzină (1.0 TCe)",
-      images: [
-        "https://upload.wikimedia.org/wikipedia/commons/d/d4/Dacia_Logan_2023_Front_2_%28cropped%29.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/thumb/0/0a/2023_Dacia_Logan_III_IMG_9671_%28cropped%29.jpg/2560px-2023_Dacia_Logan_III_IMG_9671_%28cropped%29.jpg",
-        "https://upload.wikimedia.org/wikipedia/commons/f/f7/Renault_Taliant_1.0_Turbo_90_X-tronic_%28Exterior%29.png",
-        "https://upload.wikimedia.org/wikipedia/commons/d/d4/Renault_Taliant_1.0_Turbo_90_X-tronic_%28Interior%29_1.png"
-      ]
+      images: [ loganImg1, loganImg2, loganImg3, loganImg4 ]
     }
   ];
 
@@ -125,7 +156,7 @@ export default function App() {
   };
 
   const sectionVariants = {
-    hidden: { opacity: 0, y: 30 },
+    hidden:  { opacity: 0, y: 30 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.6 } }
   };
 
@@ -134,24 +165,31 @@ export default function App() {
       {/* Desktop sidebar */}
       <aside className="hidden md:block fixed top-4 left-4 w-40 bg-green-800 bg-opacity-90 backdrop-blur-md text-white p-4 rounded-xl shadow-2xl z-50 space-y-2">
         <h1 className="text-xl font-bold mb-1">Flota Bolt<br/>Cluj</h1>
-        {sections.map(s => (
-          <button
-            key={s.id}
-            onClick={() => scrollTo(s.id)}
-            className={`block text-left text-sm px-2 py-1 rounded-lg hover:bg-green-700 transition ${
-              activeSection === s.id ? "bg-green-700 font-bold" : ""
-            }`}
-          >
-            {s.label}
-          </button>
-        ))}
+        {sections.map(s => {
+          const isActive = manualSection
+            ? manualSection === s.id
+            : activeSection === s.id;
+          return (
+            <button
+              key={s.id}
+              onClick={() => scrollTo(s.id)}
+              className={`block text-left text-sm px-2 py-1 rounded-lg hover:bg-green-700 transition ${
+                isActive ? "bg-green-700 font-bold" : ""
+              }`}
+            >
+              {s.label}
+            </button>
+          );
+        })}
       </aside>
 
       {/* Mobile bottom-nav */}
       <header className="md:hidden fixed bottom-0 left-0 w-full bg-white bg-opacity-90 backdrop-blur-md flex justify-around items-center py-2 shadow-t-lg z-50">
         {[Home, Star, ListChecks, Car, MessageCircle].map((Icon, i) => {
           const s = sections[i];
-          const isActive = activeSection === s.id;
+          const isActive = manualSection
+            ? manualSection === s.id
+            : activeSection === s.id;
           return (
             <button
               key={s.id}
@@ -170,6 +208,7 @@ export default function App() {
         })}
       </header>
 
+      {/* Conținut principal */}
       <main className="ml-0 md:ml-64 w-full pt-0 md:pt-0">
         <AnimatePresence>
           {sections.map(sec => (
@@ -190,10 +229,15 @@ export default function App() {
                   <p className="text-lg">
                     Alătură-te flotei noastre autorizate și începe să câștigi bani conducând pentru{" "}
                     <strong>Bolt</strong> sau <strong>Uber</strong> în Cluj! Poți folosi{" "}
-                    <strong>propriul autoturism</strong> sau unul <strong>pus la dispoziție de noi</strong>. Oferim suport complet pentru a începe cât mai ușor și rapid.
+                    <strong>propriul autoturism</strong> sau unul{" "}
+                    <strong>pus la dispoziție de noi</strong>. Oferim suport complet pentru a începe
+                    cât mai ușor și rapid.
                   </p>
                   <p className="text-lg text-green-700">
-                    Inclusiv posibilitatea de a <strong>achizitiona autoturismul dorit prin chirie cu ramanere</strong>, lucrând ca șofer în cadrul flotei noastre. Totul transparent, documentat legal și adaptat nevoilor tale.
+                    Inclusiv posibilitatea de a{" "}
+                    <strong>achiziționa autoturismul dorit prin închiriere cu opțiune de cumpărare</strong>,
+                    lucrând ca șofer în cadrul flotei noastre. Totul transparent, documentat legal și
+                    adaptat nevoilor tale.
                   </p>
                   <div className="flex flex-wrap justify-center gap-4 mt-8">
                     <motion.div className="bg-white bg-opacity-80 backdrop-blur rounded-lg px-6 py-4 shadow-lg">
@@ -227,7 +271,7 @@ export default function App() {
                       "Suport pentru a lucra în cadrul Bolt/Uber pe autoturismul propriu sau pe unul din cele ale flotei.",
                       "Asistență rutieră și tehnică 24/7.",
                       "Asigurăm eliberarea copiei conforme și a ecusoanelor de la ARR.",
-                      "Posibilitatea de a achiziționa autoturismul lucrând prin flotă (chirie cu opțiune de cumpărare), cu documentație legală completă și perioadă/rată flexibilă discutabilă individual."
+                      "Posibilitatea de a închiria mașina cu opțiune de cumpărare (chirie cu rămânere), astfel să o poți cumpăra în timp ce lucrezi și generezi venituri. Totul cu documentație legală, completă și condiții de rate personalizate de la caz la caz."
                     ].map((item, i) => (
                       <li key={i}>
                         <Check className="inline-block w-5 h-5 text-green-700 mr-2" />
@@ -240,39 +284,35 @@ export default function App() {
 
               {/* Cerințe */}
               {sec.id === "cerinte" && (
-                <div className="max-w-3xl mx-auto space-y-6">
-                  <h2 className="text-3xl font-semibold text-green-700">
-                    Cerințe
-                  </h2>
-                  <p className="text-lg">
-                    Serviciile de transport alternativ sunt reglementate de OUG
-                    49/2019. Pentru a desfășura această activitate trebuie să
-                    îndeplinești:
+                <div className="max-w-3xl mx-auto">
+                  <h2 className="text-3xl font-semibold text-green-700">Cerințe</h2>
+                  <p className="text-lg mt-2">
+                    Serviciile de transport alternativ sunt reglementate de <strong>OUG 49/2019</strong>. 
+                    Pentru a desfășura această activitate trebuie să îndeplinești:
                   </p>
-                  <ul className="list-decimal list-inside text-lg space-y-3">
-                    <li>Vârsta minimă: 21 de ani</li>
-                    <li>Permis de conducere cu vechime de minim 2 ani</li>
-                    <li>Cazier judiciar fără abateri</li>
-                    <li>
-                      Cazier auto cu istoricul pe ultimii 5 ani (fără suspendarea
-                      dreptului de a conduce în ultimul an pentru conducerea sub
-                      influența băuturilor alcoolice sau a substanțelor
-                      psihoactive sau implicarea în accidente rutiere grave)
-                    </li>
-                    <li>
-                      Adeverință de la medicul de familie care să ateste că ești
-                      clinic sănătos
-                    </li>
-                  </ul>
+                  <div className="space-y-4 mt-6">
+                    {[
+                      "Vârsta minimă: 21 de ani",
+                      "Permis de conducere cu vechime de minim 2 ani",
+                      "Cazier judiciar fără abateri",
+                      "Cazier auto cu istoricul pe ultimii 5 ani (fără suspendarea dreptului de a conduce în ultimul an pentru conducerea sub influența băuturilor alcoolice sau a substanțelor psihoactive sau implicarea în accidente rutiere grave)",
+                      "Adeverință de la medicul de familie care să ateste că ești clinic sănătos"
+                    ].map((item, idx) => (
+                      <div key={idx} className="flex items-start gap-3">
+                        <div className="flex-shrink-0 w-6 h-6 flex items-center justify-center bg-green-700 text-white rounded-full text-sm font-semibold mt-1">
+                          {idx + 1}
+                        </div>
+                        <p className="text-lg">{item}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               )}
 
               {/* Mașini flotă */}
               {sec.id === "masini" && (
                 <div className="max-w-4xl mx-auto space-y-6">
-                  <h2 className="text-3xl font-semibold text-green-700">
-                    Mașinile noastre
-                  </h2>
+                  <h2 className="text-3xl font-semibold text-green-700">Mașinile noastre</h2>
                   {masini.map(car => (
                     <motion.div
                       key={car.id}
@@ -281,16 +321,22 @@ export default function App() {
                       transition={{ duration: 0.4 }}
                       className="bg-white rounded-xl shadow-md p-6 mb-6"
                     >
-                      <div className="flex flex-col sm:flex-row sm:items-center gap-6 flex-wrap">
-                        <div className="flex flex-col flex-shrink-0">
+                      <div className="flex flex-col sm:flex-row sm:items-center gap-6">
+                        {/* imagine + badge overlay */}
+                        <div className="relative flex-shrink-0">
                           <img
                             src={car.images[0]}
                             alt={car.title}
                             className="w-full sm:w-64 h-40 object-cover rounded mb-4 cursor-pointer"
-                            onClick={() =>
-                              openImageViewer(car, car.images[0])
-                            }
+                            onClick={() => openImageViewer(car, car.images[0])}
                           />
+                          <span
+                            className={`absolute top-2 left-2 text-xs font-semibold px-2 py-0.5 rounded-full ${
+                              STATUS_CLASSES[car.status]
+                            }`}
+                          >
+                            {car.status}
+                          </span>
                           <div className="flex gap-2">
                             {car.images.slice(1, 4).map((img, i) => (
                               <img
@@ -302,20 +348,15 @@ export default function App() {
                             ))}
                           </div>
                         </div>
+
+                        {/* detalii text */}
                         <div className="flex-grow space-y-1">
-                          <h3 className="text-xl font-semibold">
-                            {car.title}
-                          </h3>
+                          <h3 className="text-xl font-semibold">{car.title}</h3>
                           <p className="text-sm">Kilometraj: {car.km}</p>
-                          <p className="text-sm">
-                            Transmisie: {car.transmission}
-                          </p>
+                          <p className="text-sm">Transmisie: {car.transmission}</p>
                           <p className="text-sm">Combustibil: {car.fuel}</p>
-                          <p className="text-green-700 font-bold mt-2">
-                            {car.rent}
-                          </p>
+                          <p className="text-green-700 font-bold mt-2">{car.rent}</p>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-sm font-semibold flex-shrink-0 ${car.status==="Disponibilă"? "bg-green-200 text-green-800" : "bg-gray-300 text-gray-600"}`}>{car.status}</span>
                       </div>
                     </motion.div>
                   ))}
@@ -324,31 +365,22 @@ export default function App() {
 
               {/* Contact */}
               {sec.id === "contact" && (
-                <div className="max-w-3xl mx-auto space-y-6 text-center">
-                  <h2 className="text-3xl font-semibold text-green-800">
-                    Contact
-                  </h2>
+                <div className="max-w-3xl mx-auto space-y-6 text-center pb-5">
+                  <h2 className="text-3xl font-semibold text-green-800">Contact</h2>
                   <p>Vrei să începi sau ai întrebări? Suntem aici pentru tine.</p>
                   <div className="flex flex-col sm:flex-row justify-center gap-6 text-sm">
                     <div className="flex items-center gap-2">
                       <Building2 className="w-5 h-5" />
-                      <div>
-                        <p>SC Flota Trans SRL</p>
-                        <p>CUI: RO12345678</p>
-                      </div>
+                      <div><p>SC Siatati SRL</p></div>
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="w-5 h-5" />
                       <FaWhatsapp size={20} className="text-green-500" />
-                      <a href="tel:+40712345678" className="underline">
-                        +40 712 345 678
-                      </a>
+                      <a href="tel:+40760556225" className="underline">+40 760 556 225</a>
                     </div>
                     <div className="flex items-center gap-2">
                       <Mail className="w-5 h-5" />
-                      <a href="mailto:flota@example.com" className="underline">
-                        flota@example.com
-                      </a>
+                      <a href="mailto:siatati3003@gmail.com" className="underline">siatati3003@gmail.com</a>
                     </div>
                   </div>
                 </div>
@@ -367,15 +399,13 @@ export default function App() {
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
-            <button
-              className="absolute top-6 right-6 text-white"
-              onClick={closeImageViewer}
-            >
+            <button className="absolute top-6 right-6 text-white" onClick={closeImageViewer}>
               <X size={32} />
             </button>
             <img
               src={selectedImage}
               className="max-w-full max-h-[80vh] mb-4 object-contain rounded-lg"
+              alt="Preview"
             />
             <div className="flex gap-3 overflow-x-auto px-4">
               {selectedCar.images.map((img, i) => (
@@ -386,6 +416,7 @@ export default function App() {
                     selectedImage === img ? "border-2 border-white" : ""
                   }`}
                   onClick={() => setSelectedImage(img)}
+                  alt={`Thumbnail ${i+1}`}
                 />
               ))}
             </div>
